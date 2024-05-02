@@ -17,6 +17,7 @@ class Database {
     try {
       await _crearDB(conn);
       await _crearTablaUsuarios(conn);
+      await _crearTablaingresos(conn);
       await conn.close();
     } catch (e) {
       print(e);
@@ -52,5 +53,19 @@ class Database {
         dinerogastado VARCHAR(20) NOT NULL
     )''');
     print('Tabla usuarios creada');
+  }
+
+  _crearTablaingresos(conn) async {
+    await conn.query('''CREATE TABLE IF NOT EXISTS ingresos(
+        idusuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(50) NOT NULL UNIQUE,
+        apellido VARCHAR(50) NOT NULL,
+        estado VARCHAR(50) NOT NULL,
+        dinerocine INT NOT NULL,
+        dinerotiendas INT NOT NULL,
+        votacioncine(50) NOT NULL,
+        estadotienda(50) NOT NULL
+    )''');
+    print('Tabla ingresos creada');
   }
 }
