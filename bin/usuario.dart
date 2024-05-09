@@ -10,6 +10,15 @@ class Usuario {
   String? password;
   String? direccion;
   String? direccioncorreo;
+  int? vecesidas = 0;
+  int? dinerogastado = 0;
+
+  String?usuarioadmin;
+  int? idusuarioadmin;
+  String? nombreadmin;
+  String? passwordadmin;
+  String? tiendaperteneciente;
+  int? dinerototaltienda;
   bool admin = false;
 
   //Constructores
@@ -31,8 +40,9 @@ class Usuario {
         Usuario usuario = Usuario.fromMap(resultado.first);
         if (this.password == usuario.password) {
           return usuario;
-        } else
+        } else {
           return false;
+        }
       } catch (e) {
         print(e);
         return false;
@@ -48,10 +58,11 @@ class Usuario {
       var resultado = await conn
           .query('SELECT * FROM usuarios WHERE nombre = ?', [this.nombre]);
       Usuario usuario = Usuario.fromMap(resultado.first);
-      if (this.password == usuario.password) {
+      if (password == usuario.password) {
         return usuario;
-      } else
+      } else {
         return false;
+      }
     } catch (e) {
       print(e);
       return false;
@@ -79,9 +90,22 @@ class Usuario {
     var conn = await Database().conexion();
     try {
       await conn.query(
-          'INSERT INTO jugador(nombre,apellido,password,direccion,direccioncorreo) VALUES (?,?,?,?,?)',
-          [nombre, apellido, password, direccion, direccioncorreo]);
+          'INSERT INTO usuarios(nombre,apellido,password,direccion,direccioncorreo,vecesidas,dinerogastado) VALUES (?,?,?,?,?,?,?)',
+          [nombre, apellido, password, direccion, direccioncorreo,vecesidas,dinerogastado]);
       print('Usuario insertado correctamente');
+    } catch (e) {
+      print(e);
+    } finally {
+      await conn.close();
+    }
+  }
+   insertarUsuarioAdmin() async {
+    var conn = await Database().conexion();
+    try {
+      await conn.query(
+          'INSERT INTO usuarioadmin(idusuarioadmin,nombreadmin,passwordadmin,tiendaperteneciente) VALUES (?,?,?,?)',
+          [idusuarioadmin,nombreadmin,passwordadmin,tiendaperteneciente]);
+      print('Usuario admin insertado correctamente');
     } catch (e) {
       print(e);
     } finally {
