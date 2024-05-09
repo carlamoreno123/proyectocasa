@@ -10,16 +10,11 @@ class Usuario {
   String? password;
   String? direccion;
   String? direccioncorreo;
+  String? dinerogastado = '0';
   int? vecesidas = 0;
-  int? dinerogastado = 0;
 
- 
-  int? idusuarioadmin;
-  String? nombreadmin;
-  String? passwordadmin;
   String? tiendaperteneciente;
-  int? dinerototaltienda;
-  bool admin = false;
+  int? admin = 0;
 
   //Constructores
 
@@ -32,35 +27,19 @@ class Usuario {
     this.direccioncorreo = map['direccioncorreo'];
     this.dinerogastado = map['dinerogastado'];
     this.vecesidas = map['vecesidas'];
-
-    //Metodos
-    LoginUsuario() async {
-      var conn = await Database().conexion();
-      try {
-        var resultado = await conn
-            .query('SELECT * FROM usuarios WHERE nombre = ?', [this.nombre]);
-        Usuario usuario = Usuario.fromMap(resultado.first);
-        if (this.password == usuario.password) {
-          return usuario;
-        } else {
-          return false;
-        }
-      } catch (e) {
-        print(e);
-        return false;
-      } finally {
-        await conn.close();
-      }
-    }
+    this.tiendaperteneciente = map['tiendaperteneciente'];
+    this.admin = map['admin'];
   }
 
+  //Metodos
   loginUsuario() async {
     var conn = await Database().conexion();
     try {
-      var resultado = await conn
-          .query('SELECT * FROM usuarios WHERE nombre = ?', [this.nombre]);
+      var resultado = await conn.query('SELECT * FROM usuarios WHERE nombre = ?', [
+        this.nombre
+      ]);
       Usuario usuario = Usuario.fromMap(resultado.first);
-      if (password == usuario.password) {
+      if (this.password == usuario.password) {
         return usuario;
       } else {
         return false;
@@ -75,11 +54,9 @@ class Usuario {
 
   all() async {
     var conn = await Database().conexion();
-
     try {
       var resultado = await conn.query('SELECT * FROM usuarios');
-      List<Usuario> usuarios =
-          resultado.map((row) => Usuario.fromMap(row)).toList();
+      List<Usuario> usuarios = resultado.map((row) => Usuario.fromMap(row)).toList();
       return usuarios;
     } catch (e) {
       print(e);
@@ -91,32 +68,18 @@ class Usuario {
   insertarUsuario() async {
     var conn = await Database().conexion();
     try {
-      await conn.query(
-          'INSERT INTO usuarios(nombre,apellido,password,direccion,direccioncorreo,vecesidas,dinerogastado) VALUES (?,?,?,?,?,?,?)',
-          [
-            nombre,
-            apellido,
-            password,
-            direccion,
-            direccioncorreo,
-            vecesidas,
-            dinerogastado
-          ]);
+      await conn.query('INSERT INTO usuarios(nombre,apellido,password,direccion,direccioncorreo,vecesidas,dinerogastado,tiendaperteneciente,admin) VALUES (?,?,?,?,?,?,?,?,?)', [
+        nombre,
+        apellido,
+        password,
+        direccion,
+        direccioncorreo,
+        dinerogastado,
+        vecesidas,
+        tiendaperteneciente,
+        admin
+      ]);
       print('Usuario insertado correctamente');
-    } catch (e) {
-      print(e);
-    } finally {
-      await conn.close();
-    }
-  }
-
-  insertarUsuarioAdmin() async {
-    var conn = await Database().conexion();
-    try {
-      await conn.query(
-          'INSERT INTO usuarioadmin(idusuarioadmin,nombreadmin,passwordadmin,tiendaperteneciente) VALUES (?,?,?,?)',
-          [idusuarioadmin, nombreadmin, passwordadmin, tiendaperteneciente]);
-      print('Usuario admin insertado correctamente');
     } catch (e) {
       print(e);
     } finally {

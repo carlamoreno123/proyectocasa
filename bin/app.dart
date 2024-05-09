@@ -1,14 +1,11 @@
 import 'dart:io';
-import 'dart:math';
 import 'usuario.dart';
-import 'database.dart';
 import 'valoraciontienda.dart';
-
 
 class app {
   //Constructores
 
-  menuInicial() {
+  menuInicial() async {
     int? opcion;
     do {
       stdout.writeln('''Elige una opción
@@ -20,16 +17,17 @@ class app {
     } while (_menuinicialrespuestanovalida(opcion));
     switch (opcion) {
       case 1:
-        registrarusuario();
+        await registrarusuario();
         break;
       case 2:
-        comprobarAdmin();
+        await comprobarAdmin();
         break;
       case 3:
-        login();
+        await login();
         break;
     }
   }
+
   menuLogueado(usuario) async {
     int? opcion;
     do {
@@ -48,7 +46,8 @@ class app {
         break;
     }
   }
-  menuAdmin(usuarioadmin)async {
+
+  menuAdmin(usuarioadmin) async {
     int? opcion;
     do {
       stdout.writeln('''Hola, ${usuarioadmin.nombre}, elige una opción
@@ -59,6 +58,7 @@ class app {
     } while (_menulogueadorespuestanovalida(opcion));
     switch (opcion) {
       case 1:
+        await listarValoraciones();
         break;
       case 2:
         print('adios!');
@@ -66,37 +66,34 @@ class app {
     }
   }
 
-
-  comprobarAdmin() {
+  comprobarAdmin() async {
     stdout.writeln('escribe la contraseña');
     String? respuesta = stdin.readLineSync() ?? 'e';
     if (respuesta == '12345') {
-      registrarAdmin();
+      await registrarAdmin();
+    } else {
+      print('contraseña incorrecta');
     }
-    print('contraseña incorrecta');
   }
 
-  registrarAdmin() {
+  registrarAdmin() async {
     Usuario usuarioadmin = Usuario();
-    stdout.writeln(
-        '''Hola, bienvenido  tenemos que verificar tu entidad, por
+    stdout.writeln('''Hola, bienvenido  tenemos que verificar tu entidad, por
         favor rellene estos datos:''');
     stdout.write('1-nombre admin:');
-    usuarioadmin.nombreadmin = stdin.readLineSync();
+    usuarioadmin.nombre = stdin.readLineSync();
     stdout.write('2-password admin:');
-    usuarioadmin.passwordadmin= stdin.readLineSync();
+    usuarioadmin.password = stdin.readLineSync();
     stdout.write('3-tienda perteneciente:');
-    usuarioadmin.tiendaperteneciente = stdin.readLineSync();
-    usuarioadmin.insertarUsuarioAdmin();
-    stdout.writeln('vale, eres tu $usuarioadmin');
-    usuarioadmin.insertarUsuarioAdmin();
-    menuAdmin(usuarioadmin);
+    usuarioadmin.tiendaperteneciente = elegirTienda();
+    usuarioadmin.admin = 1;
+    await usuarioadmin.insertarUsuario();
+    stdout.writeln('vale, eres tu ${usuarioadmin.nombre}');
   }
 
   registrarusuario() async {
     Usuario usuario = Usuario();
-    stdout.write(
-        '''Hola, bienvenido estas apunto de resgistrarte en este centro comercial, porfavor
+    stdout.write('''Hola, bienvenido estas apunto de resgistrarte en este centro comercial, porfavor
       rellene estos datos:''');
     stdout.write('1- nombre:');
     usuario.nombre = stdin.readLineSync();
@@ -109,12 +106,10 @@ class app {
     stdout.write('5-direccioncorreo:');
     usuario.direccioncorreo = stdin.readLineSync();
 
-    usuario.insertarUsuario();
+    await usuario.insertarUsuario();
   }
 
-  
-
-  crearValoracion(int id)async{
+  crearValoracion(int id) async {
     Valoraciontienda valoracion = Valoraciontienda();
     valoracion.idusuario = id;
     valoracion.tiendaperteneciente = elegirTienda();
@@ -122,10 +117,15 @@ class app {
     valoracion.valoraciontienda = stdin.readLineSync();
     await valoracion.insertarValoracion();
   }
-  
 
-  elegirTienda(){
-    Map<int,String> tiendas = {1: 'Zara', 2: 'Carrefour', 3:'Stradivarius',4:'Pull and bear' ,5:'Bershka'};
+  elegirTienda() {
+    Map<int, String> tiendas = {
+      1: 'Zara',
+      2: 'Carrefour',
+      3: 'Stradivarius',
+      4: 'Pull and bear',
+      5: 'Bershka'
+    };
     int? opcion;
     do {
       stdout.writeln('''Elige una tienda:
@@ -136,11 +136,10 @@ class app {
       5 -> Bershka''');
       String respuesta = stdin.readLineSync() ?? 'e';
       opcion = int.tryParse(respuesta);
-    } while (opcion == null || opcion != 1 && opcion != 2 && opcion!=3 && opcion !=4 && opcion !=5);
+    } while (opcion == null || opcion != 1 && opcion != 2 && opcion != 3 && opcion != 4 && opcion != 5);
     return tiendas[opcion];
   }
 
-  
   login() async {
     Usuario usuario = new Usuario();
     stdout.writeln('Introduce tu nombre de usuario');
@@ -152,17 +151,24 @@ class app {
       stdout.writeln('Tu nombre de usuario o contraseña son incorrectos');
       menuInicial();
     } else {
-      if (usuario.admin) {
-        menuAdmin(resultado);
+      if (resultado.admin == 1) {
+        await menuAdmin(resultado);
+      } else {
+        await menuLogueado(resultado);
       }
-      menuLogueado(resultado);
     }
   }
-  
 
-bool _menuinicialrespuestanovalida(var opcion) =>
-    opcion == null || opcion != 1 && opcion != 2 && opcion != 3;
-bool _menulogueadorespuestanovalida(var opcion) =>
-    opcion == null || opcion != 1 && opcion != 2 && opcion != 3 && opcion != 4;
-int? parsearrespuesta() => int.tryParse(stdin.readLineSync() ?? 'e');
+  listarValoraciones() async {
+    String respuesta = elegirTienda();
+    List valoraciones = await Valoraciontienda().allvaloracion(respuesta);
+
+    for (var elemento in valoraciones) {
+      print('el id: ${elemento.idusuario} ha dejado esta valoración: ${elemento.valoraciontienda}');
+    }
+  }
+
+  bool _menuinicialrespuestanovalida(var opcion) => opcion == null || opcion != 1 && opcion != 2 && opcion != 3;
+  bool _menulogueadorespuestanovalida(var opcion) => opcion == null || opcion != 1 && opcion != 2 && opcion != 3 && opcion != 4;
+  int? parsearrespuesta() => int.tryParse(stdin.readLineSync() ?? 'e');
 }
