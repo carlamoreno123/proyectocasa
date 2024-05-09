@@ -52,19 +52,15 @@ class app {
     int? opcion;
     do {
       stdout.writeln('''Hola, ${usuarioadmin.nombre}, elige una opción
-      1- sumar ingresos totales
-      2 - ver valoraciones
-      3-salir
+      1- ver valoraciones
+      2-salir
       ''');
       opcion = parsearrespuesta();
     } while (_menulogueadorespuestanovalida(opcion));
     switch (opcion) {
       case 1:
-        sumaringresostotales(Usuario());
         break;
       case 2:
-        break;
-      case 3:
         print('adios!');
         break;
     }
@@ -129,17 +125,18 @@ class app {
   
 
   elegirTienda(){
-    Map<int,String> tiendas = {1: 'Zara', 2: 'Carrefour', 3:'Stradivarius',4:'Pull and bear'};
+    Map<int,String> tiendas = {1: 'Zara', 2: 'Carrefour', 3:'Stradivarius',4:'Pull and bear' ,5:'Bershka'};
     int? opcion;
     do {
       stdout.writeln('''Elige una tienda:
       1 -> Zara
       2 -> Carrefour
       3 -> Stradivarius
-      4 -> Pull and bear''');
+      4 -> Pull and bear
+      5 -> Bershka''');
       String respuesta = stdin.readLineSync() ?? 'e';
       opcion = int.tryParse(respuesta);
-    } while (opcion == null || opcion != 1 && opcion != 2 && opcion!=3 && opcion !=4);
+    } while (opcion == null || opcion != 1 && opcion != 2 && opcion!=3 && opcion !=4 && opcion !=5);
     return tiendas[opcion];
   }
 
@@ -162,16 +159,10 @@ class app {
     }
   }
   
-  sumaringresostotales(Usuario)async {
-    stdout.writeln('Sumaremos todos los ingresos de todas las tiendas');
-    
-
-
-  }
-}
 
 bool _menuinicialrespuestanovalida(var opcion) =>
     opcion == null || opcion != 1 && opcion != 2 && opcion != 3;
 bool _menulogueadorespuestanovalida(var opcion) =>
     opcion == null || opcion != 1 && opcion != 2 && opcion != 3 && opcion != 4;
 int? parsearrespuesta() => int.tryParse(stdin.readLineSync() ?? 'e');
+}

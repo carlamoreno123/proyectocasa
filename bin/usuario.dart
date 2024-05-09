@@ -13,7 +13,7 @@ class Usuario {
   int? vecesidas = 0;
   int? dinerogastado = 0;
 
-  String?usuarioadmin;
+ 
   int? idusuarioadmin;
   String? nombreadmin;
   String? passwordadmin;
@@ -30,6 +30,8 @@ class Usuario {
     this.password = map['password'];
     this.direccion = map['direccion'];
     this.direccioncorreo = map['direccioncorreo'];
+    this.dinerogastado = map['dinerogastado'];
+    this.vecesidas = map['vecesidas'];
 
     //Metodos
     LoginUsuario() async {
@@ -91,7 +93,15 @@ class Usuario {
     try {
       await conn.query(
           'INSERT INTO usuarios(nombre,apellido,password,direccion,direccioncorreo,vecesidas,dinerogastado) VALUES (?,?,?,?,?,?,?)',
-          [nombre, apellido, password, direccion, direccioncorreo,vecesidas,dinerogastado]);
+          [
+            nombre,
+            apellido,
+            password,
+            direccion,
+            direccioncorreo,
+            vecesidas,
+            dinerogastado
+          ]);
       print('Usuario insertado correctamente');
     } catch (e) {
       print(e);
@@ -99,12 +109,13 @@ class Usuario {
       await conn.close();
     }
   }
-   insertarUsuarioAdmin() async {
+
+  insertarUsuarioAdmin() async {
     var conn = await Database().conexion();
     try {
       await conn.query(
           'INSERT INTO usuarioadmin(idusuarioadmin,nombreadmin,passwordadmin,tiendaperteneciente) VALUES (?,?,?,?)',
-          [idusuarioadmin,nombreadmin,passwordadmin,tiendaperteneciente]);
+          [idusuarioadmin, nombreadmin, passwordadmin, tiendaperteneciente]);
       print('Usuario admin insertado correctamente');
     } catch (e) {
       print(e);
